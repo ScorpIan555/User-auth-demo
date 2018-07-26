@@ -30,6 +30,7 @@ var Auth = (function (Component) {
         password: ""
       }
     };
+    // Bind this to class methods
     this.updateVisitor = this.updateVisitor.bind(this);
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
@@ -54,8 +55,7 @@ var Auth = (function (Component) {
     },
     updateVisitor: {
       value: function updateVisitor(attr, event) {
-        console.log(attr + " == " + event.target.value);
-
+        // console.log(attr + ' == ' + event.target.value)
         var updatedVisitor = Object.assign({}, this.state.visitor);
         updatedVisitor[attr] = event.target.value;
 
@@ -70,7 +70,7 @@ var Auth = (function (Component) {
       value: function register(event) {
         var _this = this;
         event.preventDefault();
-        console.log("register: " + JSON.stringify(this.state.visitor));
+        // console.log('register: ' + JSON.stringify(this.state.visitor))
 
         HTTPClient.post("/auth/register", this.state.visitor).then(function (data) {
           console.log("GET: " + JSON.stringify(user));
@@ -87,7 +87,7 @@ var Auth = (function (Component) {
       value: function login(event) {
         var _this = this;
         event.preventDefault();
-        console.log("login: " + JSON.stringify(this.state.visitor));
+        // console.log('login: ' + JSON.stringify(this.state.visitor))
 
         HTTPClient.post("/auth/login", this.state.visitor).then(function (data) {
           console.log("GET: " + JSON.stringify(data));
@@ -127,7 +127,7 @@ var Auth = (function (Component) {
                 React.createElement("br", null),
                 React.createElement(
                   "button",
-                  { onClick: this.register.bind(this) },
+                  { onClick: this.register },
                   "Join"
                 )
               ),
@@ -146,7 +146,7 @@ var Auth = (function (Component) {
                 React.createElement("br", null),
                 React.createElement(
                   "button",
-                  { onClick: this.login.bind(this) },
+                  { onClick: this.login },
                   "Login"
                 )
               )

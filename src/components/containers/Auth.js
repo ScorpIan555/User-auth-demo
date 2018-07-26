@@ -12,6 +12,7 @@ class Auth extends Component {
         password: ''
       }
     }
+    // Bind this to class methods
     this.updateVisitor = this.updateVisitor.bind(this)
     this.register = this.register.bind(this)
     this.login = this.login.bind(this)
@@ -30,8 +31,7 @@ class Auth extends Component {
   }
 
   updateVisitor(attr, event) {
-    console.log(attr + ' == ' + event.target.value)
-
+    // console.log(attr + ' == ' + event.target.value)
     let updatedVisitor = Object.assign({}, this.state.visitor)
     updatedVisitor[attr] = event.target.value
 
@@ -42,7 +42,7 @@ class Auth extends Component {
 
   register(event) {
     event.preventDefault()
-    console.log('register: ' + JSON.stringify(this.state.visitor))
+    // console.log('register: ' + JSON.stringify(this.state.visitor))
 
     HTTPClient.post('/auth/register', this.state.visitor)
     .then(data => {
@@ -57,7 +57,7 @@ class Auth extends Component {
 
   login(event) {
     event.preventDefault()
-    console.log('login: ' + JSON.stringify(this.state.visitor))
+    // console.log('login: ' + JSON.stringify(this.state.visitor))
 
     HTTPClient.post('/auth/login', this.state.visitor)
     .then(data => {
@@ -81,7 +81,7 @@ class Auth extends Component {
             <form>
               <input onChange={this.updateVisitor.bind(this, 'username')} className="form-control" type="text" placeholder="username" /><br />
               <input onChange={this.updateVisitor.bind(this, 'password')} className="form-control" type="password" placeholder="password" /><br />
-              <button onClick={this.register.bind(this)}>Join</button>
+              <button onClick={this.register}>Join</button>
             </form>
 
             <hr />
@@ -90,7 +90,7 @@ class Auth extends Component {
             <form>
               <input onChange={this.updateVisitor.bind(this, 'username')} className="form-control" type="text" placeholder="Username" /><br />
               <input onChange={this.updateVisitor.bind(this, 'password')} className="form-control" type="password" placeholder="Password" /><br />
-              <button onClick={this.login.bind(this)} >Login</button>
+              <button onClick={this.login} >Login</button>
             </form>
           </div>
           <div className="col-md-6">

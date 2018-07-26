@@ -294,8 +294,8 @@ var Auth = function (_Component) {
         username: '',
         password: ''
       }
-    };
-    _this.updateVisitor = _this.updateVisitor.bind(_this);
+      // Bind this to class methods
+    };_this.updateVisitor = _this.updateVisitor.bind(_this);
     _this.register = _this.register.bind(_this);
     _this.login = _this.login.bind(_this);
     return _this;
@@ -317,8 +317,7 @@ var Auth = function (_Component) {
   }, {
     key: 'updateVisitor',
     value: function updateVisitor(attr, event) {
-      console.log(attr + ' == ' + event.target.value);
-
+      // console.log(attr + ' == ' + event.target.value)
       var updatedVisitor = Object.assign({}, this.state.visitor);
       updatedVisitor[attr] = event.target.value;
 
@@ -332,7 +331,7 @@ var Auth = function (_Component) {
       var _this3 = this;
 
       event.preventDefault();
-      console.log('register: ' + JSON.stringify(this.state.visitor));
+      // console.log('register: ' + JSON.stringify(this.state.visitor))
 
       _utils.HTTPClient.post('/auth/register', this.state.visitor).then(function (data) {
         console.log('GET: ' + JSON.stringify(user));
@@ -348,7 +347,7 @@ var Auth = function (_Component) {
       var _this4 = this;
 
       event.preventDefault();
-      console.log('login: ' + JSON.stringify(this.state.visitor));
+      // console.log('login: ' + JSON.stringify(this.state.visitor))
 
       _utils.HTTPClient.post('/auth/login', this.state.visitor).then(function (data) {
         console.log('GET: ' + JSON.stringify(data));
@@ -386,7 +385,7 @@ var Auth = function (_Component) {
               _react2.default.createElement('br', null),
               _react2.default.createElement(
                 'button',
-                { onClick: this.register.bind(this) },
+                { onClick: this.register },
                 'Join'
               )
             ),
@@ -405,7 +404,7 @@ var Auth = function (_Component) {
               _react2.default.createElement('br', null),
               _react2.default.createElement(
                 'button',
-                { onClick: this.login.bind(this) },
+                { onClick: this.login },
                 'Login'
               )
             )

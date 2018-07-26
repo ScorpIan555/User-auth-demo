@@ -5,13 +5,6 @@ const router = vertex.router()
 const Profile = require('../models/Profile')
 
 
-router.get('/test', (req, res) => {
-	res.json({
-		confirmation: 'success',
-    data: 'This is a test endpoint'
-	})
-})
-
 // Return data on the user who is currently logged in
 router.get('/currentuser', (req, res) => {
 	// session not defined -> user not logged in
@@ -49,8 +42,6 @@ router.get('/currentuser', (req, res) => {
 
 router.post('/register', (req, res) => {
 	const body = req.body
-	console.log('REGISTER: ' + JSON.stringify(body))
-
 	Profile.create(body, (err, profile) => {
 		if(err) {
 			res.json({
@@ -59,7 +50,6 @@ router.post('/register', (req, res) => {
 			})
 			return
 		}
-			console.log("SUCCESS: ", profile)
 			req.vertexSession.user = { id: profile._id.toString() }
 			res.json({
 				confirmation: 'success',
@@ -73,7 +63,6 @@ router.post('/register', (req, res) => {
 router.post('/login', (req, res) => {
 	const body = req.body
 	const username = body.username
-
 	Profile.find({ username: username }, (err, profiles) => {
 		// Request returns an error
 		if(err) {
@@ -103,7 +92,6 @@ router.post('/login', (req, res) => {
 			return
 		}
 		req.vertexSession.user = { id: profile._id.toString() }
-
 		res.json({
 			confirmation: 'success',
 			user: profile
