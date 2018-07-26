@@ -18,12 +18,12 @@ var HTTPAsyncClient = require("../utils").HTTPAsyncClient;
 module.exports = {
 
   // Synchronous action retained for demonstration purposes
-  currentUserReceivedSync: function (user) {
-    return {
-      type: "CURRENT_USER_RECEIVED_SYNC",
-      data: user
-    };
-  },
+  // currentUserReceivedSync: (user) => {
+  //   return  {
+  //     type: 'CURRENT_USER_RECEIVED_SYNC',
+  //     data: user
+  //   }
+  // },
 
   // Asynchronous actions
   currentUserReceived: function () {

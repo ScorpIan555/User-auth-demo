@@ -38,6 +38,7 @@ var Auth = (function (Component) {
     this.updateVisitor = this.updateVisitor.bind(this);
     this.register = this.register.bind(this);
     this.login = this.login.bind(this);
+    this.logout = this.logout.bind(this);
   }
 
   _inherits(Auth, Component);
@@ -45,16 +46,17 @@ var Auth = (function (Component) {
   _prototypeProperties(Auth, null, {
     componentDidMount: {
       value: function componentDidMount() {
-        var _this = this;
-        // Synchronous GET request to '/auth/currentUser' endpoint
-        // **** Note: This is (working) demonstration code, included only to show difference between a sync/async GET request
-        HTTPSyncClient.get("/auth/currentuser", null).then(function (data) {
-          var user = data.user;
-          console.log("CURRENT USER (sync): " + JSON.stringify(user));
-          _this.props.currentUserReceivedSync(user);
-        })["catch"](function (err) {
-          console.log("ERROR: " + JSON.stringify(err));
-        });
+        // // Synchronous GET request to '/auth/currentUser' endpoint
+        // // **** Note: This is (working) demonstration code, included only to show difference between a sync/async GET request
+        // HTTPSyncClient.get('/auth/currentuser', null)
+        // .then(data => {
+        //   const user = data.user
+        //   console.log('CURRENT USER (sync): ' + JSON.stringify(user))
+        //   this.props.currentUserReceivedSync(user)
+        // })
+        // .catch(err => {
+        //   console.log('ERROR: ' + JSON.stringify(err))
+        // })
 
         // Asynchronous GET request to '/auth/currentUser' endpoint
         // **** Note: THIS is how you'd do it
@@ -89,6 +91,13 @@ var Auth = (function (Component) {
         event.preventDefault();
 
         this.props.loginUser(this.state.visitor);
+      },
+      writable: true,
+      configurable: true
+    },
+    logout: {
+      value: function logout(event) {
+        this.props.logoutUser();
       },
       writable: true,
       configurable: true
@@ -142,6 +151,12 @@ var Auth = (function (Component) {
                   "button",
                   { onClick: this.login },
                   "Login"
+                ),
+                React.createElement("hr", null),
+                React.createElement(
+                  "button",
+                  { onClick: this.logout },
+                  "Logout"
                 )
               )
             ),
@@ -174,9 +189,7 @@ var stateToProps = function (state) {
 
 var dispatchToProps = function (dispatch) {
   return {
-    currentUserReceivedSync: function (user) {
-      return dispatch(actions.currentUserReceivedSync(user));
-    },
+    // currentUserReceivedSync: (user) => dispatch(actions.currentUserReceivedSync(user)),
     currentUserReceived: function () {
       return dispatch(actions.currentUserReceived());
     },

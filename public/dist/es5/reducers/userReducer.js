@@ -27,10 +27,10 @@ module.exports = function (_x, action) {
 			return newState;
 
 		// Capture current user from Synchronous Http Call
-		case constants.CURRENT_USER_RECEIVED_SYNC:
-			console.log("CURRENT_USER_RECEIVED_SYNC: " + JSON.stringify(action.data));
-			newState.currentUser = action.data;
-			return newState;
+		// case constants.CURRENT_USER_RECEIVED_SYNC:
+		// 	console.log('CURRENT_USER_RECEIVED_SYNC: ' + JSON.stringify(action.data))
+		// 	newState['currentUser'] = action.data
+		// 	return newState
 
 		case constants.USER_CREATED:
 			console.log("USER_CREATED: ", action.data);

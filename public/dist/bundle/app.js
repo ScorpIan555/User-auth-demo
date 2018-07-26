@@ -187,12 +187,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = {
 
   // Synchronous action retained for demonstration purposes
-  currentUserReceivedSync: function currentUserReceivedSync(user) {
-    return {
-      type: 'CURRENT_USER_RECEIVED_SYNC',
-      data: user
-    };
-  },
+  // currentUserReceivedSync: (user) => {
+  //   return  {
+  //     type: 'CURRENT_USER_RECEIVED_SYNC',
+  //     data: user
+  //   }
+  // },
 
   // Asynchronous actions
   currentUserReceived: function currentUserReceived() {
@@ -277,23 +277,24 @@ var Auth = function (_Component) {
     };_this.updateVisitor = _this.updateVisitor.bind(_this);
     _this.register = _this.register.bind(_this);
     _this.login = _this.login.bind(_this);
+    _this.logout = _this.logout.bind(_this);
     return _this;
   }
 
   _createClass(Auth, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var _this2 = this;
-
-      // Synchronous GET request to '/auth/currentUser' endpoint
-      // **** Note: This is (working) demonstration code, included only to show difference between a sync/async GET request
-      _utils.HTTPSyncClient.get('/auth/currentuser', null).then(function (data) {
-        var user = data.user;
-        console.log('CURRENT USER (sync): ' + JSON.stringify(user));
-        _this2.props.currentUserReceivedSync(user);
-      }).catch(function (err) {
-        console.log('ERROR: ' + JSON.stringify(err));
-      });
+      // // Synchronous GET request to '/auth/currentUser' endpoint
+      // // **** Note: This is (working) demonstration code, included only to show difference between a sync/async GET request
+      // HTTPSyncClient.get('/auth/currentuser', null)
+      // .then(data => {
+      //   const user = data.user
+      //   console.log('CURRENT USER (sync): ' + JSON.stringify(user))
+      //   this.props.currentUserReceivedSync(user)
+      // })
+      // .catch(err => {
+      //   console.log('ERROR: ' + JSON.stringify(err))
+      // })
 
       // Asynchronous GET request to '/auth/currentUser' endpoint
       // **** Note: THIS is how you'd do it
@@ -322,6 +323,12 @@ var Auth = function (_Component) {
       event.preventDefault();
 
       this.props.loginUser(this.state.visitor);
+    }
+  }, {
+    key: 'logout',
+    value: function logout(event) {
+
+      this.props.logoutUser();
     }
   }, {
     key: 'render',
@@ -373,6 +380,12 @@ var Auth = function (_Component) {
                 'button',
                 { onClick: this.login },
                 'Login'
+              ),
+              _react2.default.createElement('hr', null),
+              _react2.default.createElement(
+                'button',
+                { onClick: this.logout },
+                'Logout'
               )
             )
           ),
@@ -402,9 +415,7 @@ var stateToProps = function stateToProps(state) {
 
 var dispatchToProps = function dispatchToProps(dispatch) {
   return {
-    currentUserReceivedSync: function currentUserReceivedSync(user) {
-      return dispatch(_actions2.default.currentUserReceivedSync(user));
-    },
+    // currentUserReceivedSync: (user) => dispatch(actions.currentUserReceivedSync(user)),
     currentUserReceived: function currentUserReceived() {
       return dispatch(_actions2.default.currentUserReceived());
     },
@@ -606,10 +617,10 @@ exports.default = function () {
 			return newState;
 
 		// Capture current user from Synchronous Http Call
-		case _constants2.default.CURRENT_USER_RECEIVED_SYNC:
-			console.log('CURRENT_USER_RECEIVED_SYNC: ' + JSON.stringify(action.data));
-			newState['currentUser'] = action.data;
-			return newState;
+		// case constants.CURRENT_USER_RECEIVED_SYNC:
+		// 	console.log('CURRENT_USER_RECEIVED_SYNC: ' + JSON.stringify(action.data))
+		// 	newState['currentUser'] = action.data
+		// 	return newState
 
 		case _constants2.default.USER_CREATED:
 			console.log('USER_CREATED: ', action.data);

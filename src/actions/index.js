@@ -12,12 +12,12 @@ import { HTTPAsyncClient } from '../utils'
 export default {
 
   // Synchronous action retained for demonstration purposes
-  currentUserReceivedSync: (user) => {
-    return  {
-      type: 'CURRENT_USER_RECEIVED_SYNC',
-      data: user
-    }
-  },
+  // currentUserReceivedSync: (user) => {
+  //   return  {
+  //     type: 'CURRENT_USER_RECEIVED_SYNC',
+  //     data: user
+  //   }
+  // },
 
   // Asynchronous actions
   currentUserReceived: () => {
@@ -43,6 +43,5 @@ export default {
       return dispatch(HTTPAsyncClient.asyncGet('/auth/logout', null, constants.USER_LOGGED_OUT))
     }
   },
-
 
 }

@@ -17,20 +17,21 @@ class Auth extends Component {
     this.updateVisitor = this.updateVisitor.bind(this)
     this.register = this.register.bind(this)
     this.login = this.login.bind(this)
+    this.logout = this.logout.bind(this)
   }
 
   componentDidMount() {
-    // Synchronous GET request to '/auth/currentUser' endpoint
-    // **** Note: This is (working) demonstration code, included only to show difference between a sync/async GET request
-    HTTPSyncClient.get('/auth/currentuser', null)
-    .then(data => {
-      const user = data.user
-      console.log('CURRENT USER (sync): ' + JSON.stringify(user))
-      this.props.currentUserReceivedSync(user)
-    })
-    .catch(err => {
-      console.log('ERROR: ' + JSON.stringify(err))
-    })
+    // // Synchronous GET request to '/auth/currentUser' endpoint
+    // // **** Note: This is (working) demonstration code, included only to show difference between a sync/async GET request
+    // HTTPSyncClient.get('/auth/currentuser', null)
+    // .then(data => {
+    //   const user = data.user
+    //   console.log('CURRENT USER (sync): ' + JSON.stringify(user))
+    //   this.props.currentUserReceivedSync(user)
+    // })
+    // .catch(err => {
+    //   console.log('ERROR: ' + JSON.stringify(err))
+    // })
 
     // Asynchronous GET request to '/auth/currentUser' endpoint
     // **** Note: THIS is how you'd do it
@@ -58,6 +59,11 @@ class Auth extends Component {
     this.props.loginUser(this.state.visitor)
   }
 
+  logout(event) {
+
+    this.props.logoutUser()
+  }
+
   render() {
     const currentUser = this.props.user.currentUser // can be null
     console.log('Render.currentUser: ', JSON.stringify(currentUser))
@@ -80,6 +86,8 @@ class Auth extends Component {
               <input onChange={this.updateVisitor.bind(this, 'username')} className="form-control" type="text" placeholder="Username" /><br />
               <input onChange={this.updateVisitor.bind(this, 'password')} className="form-control" type="password" placeholder="Password" /><br />
               <button onClick={this.login} >Login</button>
+              <hr />
+              <button onClick={this.logout} >Logout</button>
             </form>
           </div>
           <div className="col-md-6">
@@ -99,7 +107,7 @@ const stateToProps = (state) => {
 
 const dispatchToProps = (dispatch) => {
   return {
-    currentUserReceivedSync: (user) => dispatch(actions.currentUserReceivedSync(user)),
+    // currentUserReceivedSync: (user) => dispatch(actions.currentUserReceivedSync(user)),
     currentUserReceived: () => dispatch(actions.currentUserReceived()),
     registerUser: (user) => dispatch(actions.registerUser(user)),
     loginUser: (user) => dispatch(actions.loginUser(user)),
