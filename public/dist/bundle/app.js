@@ -154,6 +154,97 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/actions/index.js":
+/*!******************************!*\
+  !*** ./src/actions/index.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+		value: true
+});
+
+var _constants = __webpack_require__(/*! ../constants */ "./src/constants/index.js");
+
+var _constants2 = _interopRequireDefault(_constants);
+
+var _utils = __webpack_require__(/*! ../utils */ "./src/utils/index.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * *
+	Here are a few sample actions for User managment.
+	Feel free to remove and replace with your own actions
+* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*/
+
+exports.default = {
+
+		currentUserReceived: function currentUserReceived(user) {
+				return {
+						type: 'CURRENT_USER_RECEIVED',
+						data: user
+				};
+		}
+
+		// currentUserReceived: () => {
+		//   return dispatch => {
+		//     return dispatch()
+		//   }
+		// }
+
+		// fetchUsers: (params) => {
+		// 	return dispatch => {
+		// 		return dispatch(TurboClient.getRequest('user', params, constants.USERS_RECEIVED))
+		// 	}
+		// },
+		//
+		// addUser: (params) => {
+		// 	return dispatch => {
+		// 		return dispatch(TurboClient.postRequest('user', params, constants.USER_CREATED))
+		// 	}
+		// },
+		//
+		// // Unlike addUser, register() also maintains a session for login state. After calling
+		// // TurboClient.createUser(), the new user is logged in as well:
+		// register: (params) => {
+		// 	return dispatch => {
+		// 		return dispatch(TurboClient.createUser(params, constants.USER_CREATED))
+		// 	}
+		// },
+		//
+		// loginUser: (credentials) => {
+		// 	return dispatch => {
+		// 		return dispatch(TurboClient.login(credentials, constants.CURRENT_USER_RECEIVED))
+		// 	}
+		// },
+		//
+		// currentUser: () => {
+		// 	return dispatch => {
+		// 		return dispatch(TurboClient.currentUser(constants.CURRENT_USER_RECEIVED))
+		// 	}
+		// },
+
+		// register: (params) => {
+		// 	return dispatch => {
+		// 		return dispatch(HTTPClient.createUser(params, constants.USER_CREATED))
+		// 	}
+		// },
+		//
+		// loginUser: (credentials) => {
+		// 	return dispatch => {
+		// 		return dispatch(HTTPClient.login(credentials, constants.CURRENT_USER_RECEIVED))
+		// 	}
+		// },
+
+};
+
+/***/ }),
+
 /***/ "./src/components/containers/Auth.js":
 /*!*******************************************!*\
   !*** ./src/components/containers/Auth.js ***!
@@ -175,6 +266,12 @@ var _react = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var _react2 = _interopRequireDefault(_react);
 
 var _utils = __webpack_require__(/*! ../../utils */ "./src/utils/index.js");
+
+var _reactRedux = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+
+var _actions = __webpack_require__(/*! ../../actions */ "./src/actions/index.js");
+
+var _actions2 = _interopRequireDefault(_actions);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -205,6 +302,19 @@ var Auth = function (_Component) {
   }
 
   _createClass(Auth, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      _utils.HTTPClient.get('/auth/currentuser', null).then(function (data) {
+        var user = data.user;
+        console.log('CURRENT USER: ' + JSON.stringify(user));
+        _this2.props.currentUserReceived(user);
+      }).catch(function (err) {
+        console.log('ERROR: ' + JSON.stringify(err));
+      });
+    }
+  }, {
     key: 'updateVisitor',
     value: function updateVisitor(attr, event) {
       console.log(attr + ' == ' + event.target.value);
@@ -219,11 +329,15 @@ var Auth = function (_Component) {
   }, {
     key: 'register',
     value: function register(event) {
+      var _this3 = this;
+
       event.preventDefault();
       console.log('register: ' + JSON.stringify(this.state.visitor));
 
       _utils.HTTPClient.post('/auth/register', this.state.visitor).then(function (data) {
-        console.log('GET: ' + JSON.stringify(data));
+        console.log('GET: ' + JSON.stringify(user));
+        var user = data.user;
+        _this3.props.currentUserReceived(user);
       }).catch(function (err) {
         console.log('ERROR:  ' + err.message);
       });
@@ -231,11 +345,15 @@ var Auth = function (_Component) {
   }, {
     key: 'login',
     value: function login(event) {
+      var _this4 = this;
+
       event.preventDefault();
       console.log('login: ' + JSON.stringify(this.state.visitor));
 
       _utils.HTTPClient.post('/auth/login', this.state.visitor).then(function (data) {
         console.log('GET: ' + JSON.stringify(data));
+        var user = data.user;
+        _this4.props.currentUserReceived(user);
       }).catch(function (err) {
         console.log('ERROR:  ' + err.message);
       });
@@ -243,6 +361,8 @@ var Auth = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
+      var currentUser = this.props.user.currentUser; // can be null
+
       return _react2.default.createElement(
         'div',
         { className: 'container' },
@@ -251,7 +371,7 @@ var Auth = function (_Component) {
           { className: 'row' },
           _react2.default.createElement(
             'div',
-            { className: 'col-md-6' },
+            { className: 'col-md-4' },
             _react2.default.createElement(
               'h1',
               null,
@@ -289,6 +409,16 @@ var Auth = function (_Component) {
                 'Login'
               )
             )
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'col-md-6' },
+            currentUser == null ? null : _react2.default.createElement(
+              'h1',
+              null,
+              'Welcome ',
+              currentUser.username
+            )
           )
         )
       );
@@ -298,7 +428,21 @@ var Auth = function (_Component) {
   return Auth;
 }(_react.Component);
 
-exports.default = Auth;
+var stateToProps = function stateToProps(state) {
+  return {
+    user: state.user
+  };
+};
+
+var dispatchToProps = function dispatchToProps(dispatch) {
+  return {
+    currentUserReceived: function currentUserReceived(user) {
+      return dispatch(_actions2.default.currentUserReceived(user));
+    }
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(stateToProps, dispatchToProps)(Auth);
 
 /***/ }),
 
@@ -458,9 +602,7 @@ var _constants2 = _interopRequireDefault(_constants);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * *
-	This is a sample reducer or user management. If you remove 
-	and use your own reducers, remember to update the store 
-	file (../stores/index.js) with your reducers.
+	This is the reducer for user management
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
 
@@ -478,17 +620,8 @@ exports.default = function () {
 	switch (action.type) {
 
 		case _constants2.default.CURRENT_USER_RECEIVED:
+			console.log('CURRENT_USER_RECEIVED: ' + JSON.stringify(action.data));
 			newState['currentUser'] = action.data;
-			return newState;
-
-		case _constants2.default.USERS_RECEIVED:
-			newState['all'] = action.data;
-			return newState;
-
-		case _constants2.default.USER_CREATED:
-			var array = newState.all ? Object.assign([], newState.all) : [];
-			array.unshift(action.data);
-			newState['all'] = array;
 			return newState;
 
 		default:

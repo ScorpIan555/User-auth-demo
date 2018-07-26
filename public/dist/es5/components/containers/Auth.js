@@ -16,6 +16,9 @@ var React = _interopRequire(_react);
 
 var Component = _react.Component;
 var HTTPClient = require("../../utils").HTTPClient;
+var connect = require("react-redux").connect;
+var actions = _interopRequire(require("../../actions"));
+
 var Auth = (function (Component) {
   function Auth() {
     _classCallCheck(this, Auth);
@@ -35,6 +38,20 @@ var Auth = (function (Component) {
   _inherits(Auth, Component);
 
   _prototypeProperties(Auth, null, {
+    componentDidMount: {
+      value: function componentDidMount() {
+        var _this = this;
+        HTTPClient.get("/auth/currentuser", null).then(function (data) {
+          var user = data.user;
+          console.log("CURRENT USER: " + JSON.stringify(user));
+          _this.props.currentUserReceived(user);
+        })["catch"](function (err) {
+          console.log("ERROR: " + JSON.stringify(err));
+        });
+      },
+      writable: true,
+      configurable: true
+    },
     updateVisitor: {
       value: function updateVisitor(attr, event) {
         console.log(attr + " == " + event.target.value);
@@ -51,11 +68,14 @@ var Auth = (function (Component) {
     },
     register: {
       value: function register(event) {
+        var _this = this;
         event.preventDefault();
         console.log("register: " + JSON.stringify(this.state.visitor));
 
         HTTPClient.post("/auth/register", this.state.visitor).then(function (data) {
-          console.log("GET: " + JSON.stringify(data));
+          console.log("GET: " + JSON.stringify(user));
+          var user = data.user;
+          _this.props.currentUserReceived(user);
         })["catch"](function (err) {
           console.log("ERROR:  " + err.message);
         });
@@ -65,11 +85,14 @@ var Auth = (function (Component) {
     },
     login: {
       value: function login(event) {
+        var _this = this;
         event.preventDefault();
         console.log("login: " + JSON.stringify(this.state.visitor));
 
         HTTPClient.post("/auth/login", this.state.visitor).then(function (data) {
           console.log("GET: " + JSON.stringify(data));
+          var user = data.user;
+          _this.props.currentUserReceived(user);
         })["catch"](function (err) {
           console.log("ERROR:  " + err.message);
         });
@@ -79,6 +102,8 @@ var Auth = (function (Component) {
     },
     render: {
       value: function render() {
+        var currentUser = this.props.user.currentUser; // can be null
+
         return React.createElement(
           "div",
           { className: "container" },
@@ -87,7 +112,7 @@ var Auth = (function (Component) {
             { className: "row" },
             React.createElement(
               "div",
-              { className: "col-md-6" },
+              { className: "col-md-4" },
               React.createElement(
                 "h1",
                 null,
@@ -125,6 +150,16 @@ var Auth = (function (Component) {
                   "Login"
                 )
               )
+            ),
+            React.createElement(
+              "div",
+              { className: "col-md-6" },
+              currentUser == null ? null : React.createElement(
+                "h1",
+                null,
+                "Welcome ",
+                currentUser.username
+              )
             )
           )
         );
@@ -137,4 +172,18 @@ var Auth = (function (Component) {
   return Auth;
 })(Component);
 
-module.exports = Auth;
+var stateToProps = function (state) {
+  return {
+    user: state.user
+  };
+};
+
+var dispatchToProps = function (dispatch) {
+  return {
+    currentUserReceived: function (user) {
+      return dispatch(actions.currentUserReceived(user));
+    }
+  };
+};
+
+module.exports = connect(stateToProps, dispatchToProps)(Auth);

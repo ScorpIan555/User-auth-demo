@@ -9,6 +9,19 @@ import { TurboClient } from '../utils'
 
 export default {
 
+  currentUserReceived: (user) => {
+    return  {
+      type: 'CURRENT_USER_RECEIVED',
+      data: user
+    }
+  },
+
+  // currentUserReceived: () => {
+  //   return dispatch => {
+  //     return dispatch()
+  //   }
+  // }
+
 	// fetchUsers: (params) => {
 	// 	return dispatch => {
 	// 		return dispatch(TurboClient.getRequest('user', params, constants.USERS_RECEIVED))

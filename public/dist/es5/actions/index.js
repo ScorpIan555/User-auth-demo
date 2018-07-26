@@ -13,8 +13,21 @@ var TurboClient = require("../utils").TurboClient;
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
 
-module.exports = {};
+module.exports = {
 
+		currentUserReceived: function (user) {
+				return {
+						type: "CURRENT_USER_RECEIVED",
+						data: user
+				};
+		} };
+
+
+// currentUserReceived: () => {
+//   return dispatch => {
+//     return dispatch()
+//   }
+// }
 
 // fetchUsers: (params) => {
 // 	return dispatch => {

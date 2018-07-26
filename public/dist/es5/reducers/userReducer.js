@@ -5,13 +5,9 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 var constants = _interopRequire(require("../constants"));
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * *
-	This is a sample reducer or user management. If you remove 
-	and use your own reducers, remember to update the store 
-	file (../stores/index.js) with your reducers.
+	This is the reducer for user management
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
-
-
 
 var initialState = {
 	all: null,
@@ -25,17 +21,8 @@ module.exports = function (_x, action) {
 	switch (action.type) {
 
 		case constants.CURRENT_USER_RECEIVED:
+			console.log("CURRENT_USER_RECEIVED: " + JSON.stringify(action.data));
 			newState.currentUser = action.data;
-			return newState;
-
-		case constants.USERS_RECEIVED:
-			newState.all = action.data;
-			return newState;
-
-		case constants.USER_CREATED:
-			var array = newState.all ? Object.assign([], newState.all) : [];
-			array.unshift(action.data);
-			newState.all = array;
 			return newState;
 
 		default:

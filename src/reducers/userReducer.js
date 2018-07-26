@@ -1,13 +1,9 @@
 import constants from '../constants'
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * *
-	This is a sample reducer or user management. If you remove 
-	and use your own reducers, remember to update the store 
-	file (../stores/index.js) with your reducers.
+	This is the reducer for user management
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
-
-
 
 var initialState = {
 	all: null,
@@ -20,17 +16,8 @@ export default (state = initialState, action) => {
 	switch (action.type) {
 
 		case constants.CURRENT_USER_RECEIVED:
+			console.log('CURRENT_USER_RECEIVED: ' + JSON.stringify(action.data))
 			newState['currentUser'] = action.data
-			return newState
-
-		case constants.USERS_RECEIVED:
-			newState['all'] = action.data
-			return newState
-
-		case constants.USER_CREATED:
-			let array = (newState.all) ? Object.assign([], newState.all) : []
-			array.unshift(action.data)
-			newState['all'] = array
 			return newState
 
 		default:
