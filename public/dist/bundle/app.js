@@ -165,7 +165,7 @@
 
 
 Object.defineProperty(exports, "__esModule", {
-		value: true
+  value: true
 });
 
 var _constants = __webpack_require__(/*! ../constants */ "./src/constants/index.js");
@@ -177,69 +177,47 @@ var _utils = __webpack_require__(/*! ../utils */ "./src/utils/index.js");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * *
-	Here are a few sample actions for User managment.
-	Feel free to remove and replace with your own actions
+	Actions for User Managment
+    ~note that the currentUserReceivedSync: () method is a synchronous action
+    ~note that the currentUserReceived: () method is an asynchronous action
+
 * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
 
 exports.default = {
 
-		currentUserReceived: function currentUserReceived(user) {
-				return {
-						type: 'CURRENT_USER_RECEIVED',
-						data: user
-				};
-		}
+  // Synchronous action retained for demonstration purposes
+  currentUserReceivedSync: function currentUserReceivedSync(user) {
+    return {
+      type: 'CURRENT_USER_RECEIVED_SYNC',
+      data: user
+    };
+  },
 
-		// currentUserReceived: () => {
-		//   return dispatch => {
-		//     return dispatch()
-		//   }
-		// }
+  // Asynchronous actions
+  currentUserReceived: function currentUserReceived() {
+    return function (dispatch) {
+      return dispatch(_utils.HTTPAsyncClient.asyncGet('/auth/currentuser', null, _constants2.default.CURRENT_USER_RECEIVED));
+    };
+  },
 
-		// fetchUsers: (params) => {
-		// 	return dispatch => {
-		// 		return dispatch(TurboClient.getRequest('user', params, constants.USERS_RECEIVED))
-		// 	}
-		// },
-		//
-		// addUser: (params) => {
-		// 	return dispatch => {
-		// 		return dispatch(TurboClient.postRequest('user', params, constants.USER_CREATED))
-		// 	}
-		// },
-		//
-		// // Unlike addUser, register() also maintains a session for login state. After calling
-		// // TurboClient.createUser(), the new user is logged in as well:
-		// register: (params) => {
-		// 	return dispatch => {
-		// 		return dispatch(TurboClient.createUser(params, constants.USER_CREATED))
-		// 	}
-		// },
-		//
-		// loginUser: (credentials) => {
-		// 	return dispatch => {
-		// 		return dispatch(TurboClient.login(credentials, constants.CURRENT_USER_RECEIVED))
-		// 	}
-		// },
-		//
-		// currentUser: () => {
-		// 	return dispatch => {
-		// 		return dispatch(TurboClient.currentUser(constants.CURRENT_USER_RECEIVED))
-		// 	}
-		// },
+  registerUser: function registerUser(user) {
+    return function (dispatch) {
+      return dispatch(_utils.HTTPAsyncClient.asyncPost('/auth/register', user, _constants2.default.USER_CREATED));
+    };
+  },
 
-		// register: (params) => {
-		// 	return dispatch => {
-		// 		return dispatch(HTTPClient.createUser(params, constants.USER_CREATED))
-		// 	}
-		// },
-		//
-		// loginUser: (credentials) => {
-		// 	return dispatch => {
-		// 		return dispatch(HTTPClient.login(credentials, constants.CURRENT_USER_RECEIVED))
-		// 	}
-		// },
+  loginUser: function loginUser(user) {
+    return function (dispatch) {
+      return dispatch(_utils.HTTPAsyncClient.asyncPost('/auth/login', user, _constants2.default.USER_LOGGED_IN));
+    };
+  },
+
+  logoutUser: function logoutUser() {
+    return function (dispatch) {
+      return dispatch(_utils.HTTPAsyncClient.asyncGet('/auth/logout', null, _constants2.default.USER_LOGGED_OUT));
+    };
+  }
 
 };
 
@@ -293,7 +271,8 @@ var Auth = function (_Component) {
       visitor: {
         username: '',
         password: ''
-      }
+      },
+      currentUser: {}
       // Bind this to class methods
     };_this.updateVisitor = _this.updateVisitor.bind(_this);
     _this.register = _this.register.bind(_this);
@@ -306,13 +285,19 @@ var Auth = function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      _utils.HTTPClient.get('/auth/currentuser', null).then(function (data) {
+      // Synchronous GET request to '/auth/currentUser' endpoint
+      // **** Note: This is (working) demonstration code, included only to show difference between a sync/async GET request
+      _utils.HTTPSyncClient.get('/auth/currentuser', null).then(function (data) {
         var user = data.user;
-        console.log('CURRENT USER: ' + JSON.stringify(user));
-        _this2.props.currentUserReceived(user);
+        console.log('CURRENT USER (sync): ' + JSON.stringify(user));
+        _this2.props.currentUserReceivedSync(user);
       }).catch(function (err) {
         console.log('ERROR: ' + JSON.stringify(err));
       });
+
+      // Asynchronous GET request to '/auth/currentUser' endpoint
+      // **** Note: THIS is how you'd do it
+      this.props.currentUserReceived();
     }
   }, {
     key: 'updateVisitor',
@@ -320,7 +305,6 @@ var Auth = function (_Component) {
       // console.log(attr + ' == ' + event.target.value)
       var updatedVisitor = Object.assign({}, this.state.visitor);
       updatedVisitor[attr] = event.target.value;
-
       this.setState({
         visitor: updatedVisitor
       });
@@ -328,39 +312,22 @@ var Auth = function (_Component) {
   }, {
     key: 'register',
     value: function register(event) {
-      var _this3 = this;
-
       event.preventDefault();
-      // console.log('register: ' + JSON.stringify(this.state.visitor))
 
-      _utils.HTTPClient.post('/auth/register', this.state.visitor).then(function (data) {
-        console.log('GET: ' + JSON.stringify(user));
-        var user = data.user;
-        _this3.props.currentUserReceived(user);
-      }).catch(function (err) {
-        console.log('ERROR:  ' + err.message);
-      });
+      this.props.registerUser(this.state.visitor);
     }
   }, {
     key: 'login',
     value: function login(event) {
-      var _this4 = this;
-
       event.preventDefault();
-      // console.log('login: ' + JSON.stringify(this.state.visitor))
 
-      _utils.HTTPClient.post('/auth/login', this.state.visitor).then(function (data) {
-        console.log('GET: ' + JSON.stringify(data));
-        var user = data.user;
-        _this4.props.currentUserReceived(user);
-      }).catch(function (err) {
-        console.log('ERROR:  ' + err.message);
-      });
+      this.props.loginUser(this.state.visitor);
     }
   }, {
     key: 'render',
     value: function render() {
       var currentUser = this.props.user.currentUser; // can be null
+      console.log('Render.currentUser: ', JSON.stringify(currentUser));
 
       return _react2.default.createElement(
         'div',
@@ -435,8 +402,20 @@ var stateToProps = function stateToProps(state) {
 
 var dispatchToProps = function dispatchToProps(dispatch) {
   return {
-    currentUserReceived: function currentUserReceived(user) {
-      return dispatch(_actions2.default.currentUserReceived(user));
+    currentUserReceivedSync: function currentUserReceivedSync(user) {
+      return dispatch(_actions2.default.currentUserReceivedSync(user));
+    },
+    currentUserReceived: function currentUserReceived() {
+      return dispatch(_actions2.default.currentUserReceived());
+    },
+    registerUser: function registerUser(user) {
+      return dispatch(_actions2.default.registerUser(user));
+    },
+    loginUser: function loginUser(user) {
+      return dispatch(_actions2.default.loginUser(user));
+    },
+    logoutUser: function logoutUser() {
+      return dispatch(_actions2.default.logoutUser());
     }
   };
 };
@@ -500,7 +479,9 @@ exports.default = {
 	USERS_RECEIVED: 'USERS_RECEIVED',
 	USER_CREATED: 'USER_CREATED',
 	USER_LOGGED_IN: 'USER_LOGGED_IN',
-	CURRENT_USER_RECEIVED: 'CURRENT_USER_RECEIVED'
+	CURRENT_USER_RECEIVED: 'CURRENT_USER_RECEIVED',
+	CURRENT_USER_RECEIVED_SYNC: 'CURRENT_USER_RECEIVED_SYNC',
+	USER_LOGGED_OUT: 'USER_LOGGED_OUT'
 
 };
 
@@ -618,9 +599,28 @@ exports.default = function () {
 
 	switch (action.type) {
 
+		// Capture current user from Asynchronous Http Call
 		case _constants2.default.CURRENT_USER_RECEIVED:
 			console.log('CURRENT_USER_RECEIVED: ' + JSON.stringify(action.data));
 			newState['currentUser'] = action.data;
+			return newState;
+
+		// Capture current user from Synchronous Http Call
+		case _constants2.default.CURRENT_USER_RECEIVED_SYNC:
+			console.log('CURRENT_USER_RECEIVED_SYNC: ' + JSON.stringify(action.data));
+			newState['currentUser'] = action.data;
+			return newState;
+
+		case _constants2.default.USER_CREATED:
+			console.log('USER_CREATED: ', action.data);
+			newState['currentUser'] = action.data;
+
+			return newState;
+
+		case _constants2.default.USER_LOGGED_IN:
+			console.log('USER_LOGGED_IN:', action.data);
+			newState['currentUser'] = action.data;
+
 			return newState;
 
 		default:
@@ -689,10 +689,81 @@ exports.default = {
 
 /***/ }),
 
-/***/ "./src/utils/HTTPClient.js":
-/*!*********************************!*\
-  !*** ./src/utils/HTTPClient.js ***!
-  \*********************************/
+/***/ "./src/utils/HTTPAsyncClient.js":
+/*!**************************************!*\
+  !*** ./src/utils/HTTPAsyncClient.js ***!
+  \**************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _superagent = __webpack_require__(/*! superagent */ "./node_modules/superagent/lib/client.js");
+
+var _superagent2 = _interopRequireDefault(_superagent);
+
+var _constants = __webpack_require__(/*! ../constants */ "./src/constants/index.js");
+
+var _constants2 = _interopRequireDefault(_constants);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var asyncGet = function asyncGet(endpoint, params, actionType) {
+  if (_constants2.default.CURRENT_USER_RECEIVED || _constants2.default.USER_LOGGED_OUT) {
+    return function (dispatch) {
+      return _superagent2.default.get(endpoint).query(params).set('Accept', 'application/json').then(function (data) {
+        // check actionType, then dispatch asynchronously to userReducer
+        console.log('asyncGet data:', data);
+        if (actionType != null) {
+          dispatch({
+            type: actionType,
+            params: params,
+            data: data.body.user
+          });
+        }
+      }).catch(function (err) {
+        console.log('ERROR: ', err);
+        return err;
+      });
+    };
+  }
+};
+
+var asyncPost = function asyncPost(endpoint, body, actionType) {
+  if (_constants2.default.USER_CREATED || _constants2.default.USER_LOGGED_IN) {
+    return function (dispatch) {
+      return _superagent2.default.post(endpoint).send(body).set('Accept', 'application/json').then(function (response) {
+        // check actionType, then dispatch asynchronously to userReducer
+        if (actionType != null) {
+          dispatch({
+            type: actionType,
+            data: response.body.user
+          });
+        }
+      }).catch(function (err) {
+        console.log('ERROR: ', err.message);
+        throw err;
+      });
+    };
+  }
+};
+
+exports.default = {
+  asyncGet: asyncGet,
+  asyncPost: asyncPost
+};
+
+/***/ }),
+
+/***/ "./src/utils/HTTPSyncClient.js":
+/*!*************************************!*\
+  !*** ./src/utils/HTTPSyncClient.js ***!
+  \*************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -784,7 +855,7 @@ exports.default = function (props) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.HTTPClient = exports.renderComponents = exports.ServerEntry = undefined;
+exports.HTTPAsyncClient = exports.HTTPSyncClient = exports.renderComponents = exports.ServerEntry = undefined;
 
 var _ServerEntry = __webpack_require__(/*! ./ServerEntry */ "./src/utils/ServerEntry.js");
 
@@ -794,15 +865,21 @@ var _renderComponents = __webpack_require__(/*! ./renderComponents */ "./src/uti
 
 var _renderComponents2 = _interopRequireDefault(_renderComponents);
 
-var _HTTPClient = __webpack_require__(/*! ./HTTPClient */ "./src/utils/HTTPClient.js");
+var _HTTPSyncClient = __webpack_require__(/*! ./HTTPSyncClient */ "./src/utils/HTTPSyncClient.js");
 
-var _HTTPClient2 = _interopRequireDefault(_HTTPClient);
+var _HTTPSyncClient2 = _interopRequireDefault(_HTTPSyncClient);
+
+var _HTTPAsyncClient = __webpack_require__(/*! ./HTTPAsyncClient */ "./src/utils/HTTPAsyncClient.js");
+
+var _HTTPAsyncClient2 = _interopRequireDefault(_HTTPAsyncClient);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// import TurboClient from './TurboClient'
 exports.ServerEntry = _ServerEntry2.default;
 exports.renderComponents = _renderComponents2.default;
-exports.HTTPClient = _HTTPClient2.default; // import TurboClient from './TurboClient'
+exports.HTTPSyncClient = _HTTPSyncClient2.default;
+exports.HTTPAsyncClient = _HTTPAsyncClient2.default;
 
 /***/ }),
 

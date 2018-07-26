@@ -4,14 +4,6 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var superagent = _interopRequire(require("superagent"));
 
-var asyncGet = function (endpoint, actionType) {};
-
-var asyncPost = function () {};
-
-module.exports = {
-  asyncGet: asyncGet,
-  asyncPost: asyncPost
-};
 module.exports = {
   post: function (endpoint, body) {
     return new Promise(function (resolve, reject) {

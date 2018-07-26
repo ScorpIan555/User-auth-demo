@@ -1,6 +1,5 @@
 import superagent from 'superagent'
 
-
 export default {
   post: (endpoint, body) => {
     return new Promise((resolve, reject) => {

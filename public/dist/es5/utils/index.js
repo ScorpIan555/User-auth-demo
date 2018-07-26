@@ -7,11 +7,14 @@ var ServerEntry = _interopRequire(require("./ServerEntry"));
 
 var renderComponents = _interopRequire(require("./renderComponents"));
 
-var HTTPClient = _interopRequire(require("./HTTPClient"));
+var HTTPSyncClient = _interopRequire(require("./HTTPSyncClient"));
+
+var HTTPAsyncClient = _interopRequire(require("./HTTPAsyncClient"));
 
 exports.ServerEntry = ServerEntry;
 exports.renderComponents = renderComponents;
-exports.HTTPClient = HTTPClient;
+exports.HTTPSyncClient = HTTPSyncClient;
+exports.HTTPAsyncClient = HTTPAsyncClient;
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });

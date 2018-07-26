@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { HTTPClient } from '../../utils'
+import { HTTPSyncClient, HTTPAsyncClient } from '../../utils'
 import { connect } from 'react-redux'
 import actions from '../../actions'
 
@@ -10,7 +10,8 @@ class Auth extends Component {
       visitor: {
         username: '',
         password: ''
-      }
+      },
+      currentUser: {}
     }
     // Bind this to class methods
     this.updateVisitor = this.updateVisitor.bind(this)
@@ -19,22 +20,27 @@ class Auth extends Component {
   }
 
   componentDidMount() {
-    HTTPClient.get('/auth/currentuser', null)
+    // Synchronous GET request to '/auth/currentUser' endpoint
+    // **** Note: This is (working) demonstration code, included only to show difference between a sync/async GET request
+    HTTPSyncClient.get('/auth/currentuser', null)
     .then(data => {
       const user = data.user
-      console.log('CURRENT USER: ' + JSON.stringify(user))
-      this.props.currentUserReceived(user)
+      console.log('CURRENT USER (sync): ' + JSON.stringify(user))
+      this.props.currentUserReceivedSync(user)
     })
     .catch(err => {
       console.log('ERROR: ' + JSON.stringify(err))
     })
+
+    // Asynchronous GET request to '/auth/currentUser' endpoint
+    // **** Note: THIS is how you'd do it
+    this.props.currentUserReceived()
   }
 
   updateVisitor(attr, event) {
     // console.log(attr + ' == ' + event.target.value)
     let updatedVisitor = Object.assign({}, this.state.visitor)
     updatedVisitor[attr] = event.target.value
-
     this.setState({
       visitor: updatedVisitor
     })
@@ -42,36 +48,19 @@ class Auth extends Component {
 
   register(event) {
     event.preventDefault()
-    // console.log('register: ' + JSON.stringify(this.state.visitor))
 
-    HTTPClient.post('/auth/register', this.state.visitor)
-    .then(data => {
-      console.log('GET: ' + JSON.stringify(user))
-      const user = data.user
-      this.props.currentUserReceived(user)
-    })
-    .catch(err => {
-      console.log('ERROR:  ' + err.message)
-    })
+    this.props.registerUser(this.state.visitor)
   }
 
   login(event) {
     event.preventDefault()
-    // console.log('login: ' + JSON.stringify(this.state.visitor))
 
-    HTTPClient.post('/auth/login', this.state.visitor)
-    .then(data => {
-      console.log('GET: ' + JSON.stringify(data))
-      const user = data.user
-      this.props.currentUserReceived(user)
-    })
-    .catch(err => {
-      console.log('ERROR:  ' + err.message)
-    })
+    this.props.loginUser(this.state.visitor)
   }
 
   render() {
     const currentUser = this.props.user.currentUser // can be null
+    console.log('Render.currentUser: ', JSON.stringify(currentUser))
 
     return(
       <div className="container">
@@ -95,8 +84,6 @@ class Auth extends Component {
           </div>
           <div className="col-md-6">
             { currentUser == null ? null : <h1>Welcome {currentUser.username}</h1> }
-
-
           </div>
         </div>
       </div>
@@ -112,7 +99,11 @@ const stateToProps = (state) => {
 
 const dispatchToProps = (dispatch) => {
   return {
-    currentUserReceived: (user) => dispatch(actions.currentUserReceived(user))
+    currentUserReceivedSync: (user) => dispatch(actions.currentUserReceivedSync(user)),
+    currentUserReceived: () => dispatch(actions.currentUserReceived()),
+    registerUser: (user) => dispatch(actions.registerUser(user)),
+    loginUser: (user) => dispatch(actions.loginUser(user)),
+    logoutUser: () => dispatch(actions.logoutUser())
   }
 }
 

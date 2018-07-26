@@ -15,7 +15,10 @@ var _react = require("react");
 var React = _interopRequire(_react);
 
 var Component = _react.Component;
-var HTTPClient = require("../../utils").HTTPClient;
+var _utils = require("../../utils");
+
+var HTTPSyncClient = _utils.HTTPSyncClient;
+var HTTPAsyncClient = _utils.HTTPAsyncClient;
 var connect = require("react-redux").connect;
 var actions = _interopRequire(require("../../actions"));
 
@@ -28,7 +31,8 @@ var Auth = (function (Component) {
       visitor: {
         username: "",
         password: ""
-      }
+      },
+      currentUser: {}
     };
     // Bind this to class methods
     this.updateVisitor = this.updateVisitor.bind(this);
@@ -42,13 +46,19 @@ var Auth = (function (Component) {
     componentDidMount: {
       value: function componentDidMount() {
         var _this = this;
-        HTTPClient.get("/auth/currentuser", null).then(function (data) {
+        // Synchronous GET request to '/auth/currentUser' endpoint
+        // **** Note: This is (working) demonstration code, included only to show difference between a sync/async GET request
+        HTTPSyncClient.get("/auth/currentuser", null).then(function (data) {
           var user = data.user;
-          console.log("CURRENT USER: " + JSON.stringify(user));
-          _this.props.currentUserReceived(user);
+          console.log("CURRENT USER (sync): " + JSON.stringify(user));
+          _this.props.currentUserReceivedSync(user);
         })["catch"](function (err) {
           console.log("ERROR: " + JSON.stringify(err));
         });
+
+        // Asynchronous GET request to '/auth/currentUser' endpoint
+        // **** Note: THIS is how you'd do it
+        this.props.currentUserReceived();
       },
       writable: true,
       configurable: true
@@ -58,7 +68,6 @@ var Auth = (function (Component) {
         // console.log(attr + ' == ' + event.target.value)
         var updatedVisitor = Object.assign({}, this.state.visitor);
         updatedVisitor[attr] = event.target.value;
-
         this.setState({
           visitor: updatedVisitor
         });
@@ -68,34 +77,18 @@ var Auth = (function (Component) {
     },
     register: {
       value: function register(event) {
-        var _this = this;
         event.preventDefault();
-        // console.log('register: ' + JSON.stringify(this.state.visitor))
 
-        HTTPClient.post("/auth/register", this.state.visitor).then(function (data) {
-          console.log("GET: " + JSON.stringify(user));
-          var user = data.user;
-          _this.props.currentUserReceived(user);
-        })["catch"](function (err) {
-          console.log("ERROR:  " + err.message);
-        });
+        this.props.registerUser(this.state.visitor);
       },
       writable: true,
       configurable: true
     },
     login: {
       value: function login(event) {
-        var _this = this;
         event.preventDefault();
-        // console.log('login: ' + JSON.stringify(this.state.visitor))
 
-        HTTPClient.post("/auth/login", this.state.visitor).then(function (data) {
-          console.log("GET: " + JSON.stringify(data));
-          var user = data.user;
-          _this.props.currentUserReceived(user);
-        })["catch"](function (err) {
-          console.log("ERROR:  " + err.message);
-        });
+        this.props.loginUser(this.state.visitor);
       },
       writable: true,
       configurable: true
@@ -103,6 +96,7 @@ var Auth = (function (Component) {
     render: {
       value: function render() {
         var currentUser = this.props.user.currentUser; // can be null
+        console.log("Render.currentUser: ", JSON.stringify(currentUser));
 
         return React.createElement(
           "div",
@@ -180,8 +174,20 @@ var stateToProps = function (state) {
 
 var dispatchToProps = function (dispatch) {
   return {
-    currentUserReceived: function (user) {
-      return dispatch(actions.currentUserReceived(user));
+    currentUserReceivedSync: function (user) {
+      return dispatch(actions.currentUserReceivedSync(user));
+    },
+    currentUserReceived: function () {
+      return dispatch(actions.currentUserReceived());
+    },
+    registerUser: function (user) {
+      return dispatch(actions.registerUser(user));
+    },
+    loginUser: function (user) {
+      return dispatch(actions.loginUser(user));
+    },
+    logoutUser: function () {
+      return dispatch(actions.logoutUser());
     }
   };
 };
